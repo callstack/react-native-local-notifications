@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Process
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.facebook.react.bridge.Promise
@@ -17,6 +18,11 @@ import com.facebook.react.bridge.ReactMethod
 class ExampleNotificationModule(context: ReactApplicationContext) :
   ReactContextBaseJavaModule(context) {
   override fun getName() = "ExampleNotification"
+
+  @ReactMethod
+  fun exitApp() {
+    Process.killProcess(Process.myPid())
+  }
 
   @ReactMethod
   fun getPermissionStatus(promise: Promise) {
@@ -61,6 +67,6 @@ class ExampleNotificationModule(context: ReactApplicationContext) :
   companion object {
     const val ID = 2137
     const val CATEGORY = "CATEGORY_ID"
-    const val CHANNEL = "example_alarm_channel"
+    const val CHANNEL = "example_channel"
   }
 }

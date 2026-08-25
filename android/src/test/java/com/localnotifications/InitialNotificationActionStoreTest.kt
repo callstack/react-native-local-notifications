@@ -17,7 +17,7 @@ class InitialNotificationActionStoreTest {
     Intent("com.example.$action").apply {
       putExtra(InitialNotificationActionParser.NOTIFICATION_ID, 2137)
       putExtra(InitialNotificationActionParser.CATEGORY_ID, "CATEGORY_ID")
-      putExtra(InitialNotificationActionParser.CHANNEL_ID, "example_alarm_channel")
+      putExtra(InitialNotificationActionParser.CHANNEL_ID, "example_channel")
       putExtra(InitialNotificationActionParser.ACTION_EXTRA, value)
     }
 
@@ -25,7 +25,7 @@ class InitialNotificationActionStoreTest {
     val result = InitialNotificationActionParser.parse(intent())!!
     assertEquals("2137", result.notificationId)
     assertEquals("CATEGORY_ID", result.categoryId)
-    assertEquals("example_alarm_channel", result.channelId)
+    assertEquals("example_channel", result.channelId)
     assertEquals("tapped", result.action)
   }
 

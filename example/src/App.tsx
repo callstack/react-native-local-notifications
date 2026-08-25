@@ -102,13 +102,20 @@ export default function App() {
       }
       await checkNotificationPermission();
       await NativeModules.ExampleNotification.createTestNotification();
+
+      const exitApp = () => {
+        NativeModules.ExampleNotification.exitApp();
+      };
+
       Alert.alert(
         Platform.OS === 'ios'
           ? 'Notification scheduled'
           : 'Notification created',
         Platform.OS === 'ios'
-          ? 'It will appear in 10 seconds. Dismiss this message and kill the app now.'
-          : 'Kill the app, then tap the notification.'
+          ? 'It will appear in 2 seconds. Tap OK to close the app.'
+          : 'Tap OK to close the app, then tap the notification.',
+        [{ text: 'OK', onPress: exitApp }],
+        { cancelable: false }
       );
     } catch (error) {
       const message = `Could not create notification: ${String(error)}`;

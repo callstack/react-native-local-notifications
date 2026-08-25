@@ -3,6 +3,7 @@ import React
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
 import UserNotifications
+import Darwin
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -36,6 +37,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 final class ExampleNotification: NSObject, RCTBridgeModule {
   static func moduleName() -> String! { "ExampleNotification" }
   static func requiresMainQueueSetup() -> Bool { false }
+
+  @objc
+  func exitApp() {
+    DispatchQueue.main.async {
+      exit(EXIT_SUCCESS)
+    }
+  }
 
   @objc(getPermissionStatus:rejecter:)
   func getPermissionStatus(
@@ -80,9 +88,7 @@ final class ExampleNotification: NSObject, RCTBridgeModule {
       let request = UNNotificationRequest(
         identifier: "2137",
         content: content,
-        // iOS does not present notifications while this foreground app has no
-        // UNUserNotificationCenterDelegate. Leave enough time to kill the app.
-        trigger: UNTimeIntervalNotificationTrigger(timeInterval: 10, repeats: false)
+        trigger: UNTimeIntervalNotificationTrigger(timeInterval: 2, repeats: false)
       )
       center.add(request) { error in
         if let error { reject("schedule_error", error.localizedDescription, error) }

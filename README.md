@@ -109,7 +109,7 @@ The example's notification creation code is demo-only and is not exported.
 1. Start the example and grant notification permission.
 2. Press **Create test notification**.
 3. Kill the application, then tap the notification.
-4. Verify ID `2137`, category `CATEGORY_ID`, and action `tapped` (`channelId` is `example_alarm_channel` on Android and `null` on iOS).
+4. Verify ID `2137`, category `CATEGORY_ID`, and action `tapped` (`channelId` is `example_channel` on Android and `null` on iOS).
 5. Press **Consume again** and verify `null`.
 6. Kill the app, open it using the app icon, and verify `null`.
 

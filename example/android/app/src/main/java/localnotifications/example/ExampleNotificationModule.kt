@@ -5,7 +5,10 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
@@ -14,6 +17,16 @@ import com.facebook.react.bridge.ReactMethod
 class ExampleNotificationModule(context: ReactApplicationContext) :
   ReactContextBaseJavaModule(context) {
   override fun getName() = "ExampleNotification"
+
+  @ReactMethod
+  fun getPermissionStatus(promise: Promise) {
+    val granted = Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+      ContextCompat.checkSelfPermission(
+        reactApplicationContext,
+        android.Manifest.permission.POST_NOTIFICATIONS,
+      ) == PackageManager.PERMISSION_GRANTED
+    promise.resolve(if (granted) "granted" else "denied")
+  }
 
   @ReactMethod
   fun createTestNotification(promise: Promise) {

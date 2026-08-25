@@ -37,6 +37,27 @@ final class ExampleNotification: NSObject, RCTBridgeModule {
   static func moduleName() -> String! { "ExampleNotification" }
   static func requiresMainQueueSetup() -> Bool { false }
 
+  @objc(getPermissionStatus:rejecter:)
+  func getPermissionStatus(
+    _ resolve: @escaping RCTPromiseResolveBlock,
+    rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
+    UNUserNotificationCenter.current().getNotificationSettings { settings in
+      let status: String
+      switch settings.authorizationStatus {
+      case .authorized, .provisional, .ephemeral:
+        status = "granted"
+      case .denied:
+        status = "denied"
+      case .notDetermined:
+        status = "notDetermined"
+      @unknown default:
+        status = "unknown"
+      }
+      resolve(status)
+    }
+  }
+
   @objc(createTestNotification:rejecter:)
   func createTestNotification(
     _ resolve: @escaping RCTPromiseResolveBlock,

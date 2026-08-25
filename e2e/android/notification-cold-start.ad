@@ -1,0 +1,17 @@
+# Verifies the notification cold-start payload through Android system UI.
+context platform=android timeout=60000
+
+open "localnotifications.example" --relaunch
+gesture "pan" 640 2000 0 -1900 500
+wait "label=\"Create test notification\"" 5000
+wait "text" "No initial action (null)"
+click "role=\"button\" label=\"Create test notification\" || label=\"Create test notification\""
+alert "accept"
+gesture "pan" 640 1 0 2000 500
+wait "text" "Cold-start notification test"
+click "label=\"Cold-start notification test\""
+wait "text" "\"2137\""
+wait "text" "CATEGORY_ID"
+click "role=\"button\" label=\"Consume again\" || label=\"Consume again\""
+wait "text" "No initial action (null)"
+close

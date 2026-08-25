@@ -1,0 +1,21 @@
+# Verifies the notification cold-start payload through iOS system UI.
+context platform=ios timeout=90000
+
+open "LocalNotificationsExample" --relaunch
+wait "No initial action (null)" 5000
+click "role=\"button\" label=\"Create test notification\" || label=\"Create test notification\""
+click "label=\"OK\""
+
+# Bind to SpringBoard before the delayed notification is delivered.
+open "com.apple.springboard"
+wait "Cold-start notification test" 10000
+click "role=\"other\" label=\"Cold-start notification test\""
+
+# Rebind to the app launched by the notification tap without relaunching it.
+open "LocalNotificationsExample"
+wait "\"2137\"" 5000
+wait "CATEGORY_ID" 5000
+scroll down 0.7
+click "role=\"button\" label=\"Consume again\" || label=\"Consume again\""
+wait "No initial action (null)" 5000
+close

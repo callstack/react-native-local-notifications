@@ -37,6 +37,7 @@
     "example": "yarn workspace react-native-local-notifications-example",
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
     "test:e2e:android": "agent-device test ./e2e/android --platform android",
+    "test:e2e:ios": "agent-device test ./e2e/ios --platform ios",
     "prepare": "bob build",
     "typecheck": "tsc",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",

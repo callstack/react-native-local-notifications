@@ -88,7 +88,7 @@ final class ExampleNotification: NSObject, RCTBridgeModule {
       let request = UNNotificationRequest(
         identifier: "2137",
         content: content,
-        trigger: UNTimeIntervalNotificationTrigger(timeInterval: 2, repeats: false)
+        trigger: UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
       )
       center.add(request) { error in
         if let error { reject("schedule_error", error.localizedDescription, error) }

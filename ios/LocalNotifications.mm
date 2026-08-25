@@ -1,10 +1,11 @@
 #import "LocalNotifications.h"
+#import "InitialNotificationActionStore+Internal.h"
 
 @implementation LocalNotifications
-- (NSNumber *)multiply:(double)a b:(double)b {
-    NSNumber *result = @(a * b);
-
-    return result;
+- (void)getInitialNotificationAction:(RCTPromiseResolveBlock)resolve
+                              reject:(RCTPromiseRejectBlock)reject
+{
+  resolve([InitialNotificationActionStore consume]);
 }
 
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:

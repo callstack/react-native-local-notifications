@@ -1,7 +1,7 @@
 {
   "name": "react-native-local-notifications",
   "version": "0.1.0",
-  "description": "Manage your local notifications in your React Native app",
+  "description": "Consume the local-notification action that cold-started a React Native app",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
   "exports": {
@@ -10,13 +10,15 @@
       "types": "./lib/typescript/src/index.d.ts",
       "default": "./lib/module/index.js"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./jest/mock": "./jest/mock.js"
   },
   "files": [
     "src",
     "lib",
     "android",
     "ios",
+    "jest",
     "cpp",
     "*.podspec",
     "react-native.config.js",
@@ -124,7 +126,10 @@
     "useTabs": false
   },
   "jest": {
-    "preset": "@react-native/jest-preset",
+    "testEnvironment": "node",
+    "transform": {
+      "^.+\\.[jt]sx?$": "babel-jest"
+    },
     "testEnvironmentOptions": {
       "customExportConditions": [
         "require",

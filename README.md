@@ -1,60 +1,106 @@
 # react-native-local-notifications
 
-A New Architecture TurboModule that captures and consumes the local-notification action which launched an app from a killed state.
+Recover the local-notification action that launched your React Native app from a terminated state.
 
-It does not display or schedule notifications, install notification delegates, or handle warm/background interactions. Keep your existing live notification path.
+`react-native-local-notifications` bridges the cold-start notification response to JavaScript on iOS and Android. It gives your navigation or analytics code one consistent, typed action without taking ownership of notification scheduling or live notification events.
 
-## Installation and API
+## Why use it?
+
+- Handles notification actions that launch a terminated app
+- Provides the same typed result on iOS and Android
+- Consumes each launch action exactly once
+- Works alongside your existing notification library and event listeners
+- Uses a New Architecture TurboModule with no retained native notification objects
+
+## Installation
 
 ```sh
 yarn add react-native-local-notifications
+```
+
+Or use your preferred package manager:
+
+```sh
+npm install react-native-local-notifications
+# or
+pnpm add react-native-local-notifications
+```
+
+Install iOS pods after adding the package:
+
+```sh
 cd ios && pod install
 ```
 
-Autolinking supplies the module. React Native New Architecture must be enabled.
+Autolinking handles the native module. React Native's New Architecture must be enabled.
 
-```ts
-type InitialNotificationActionType = 'tapped' | 'clear' | 'customAction';
-type InitialNotificationAction = {
-  notificationId: string;
-  categoryId: string | null;
-  channelId: string | null;
-  action: InitialNotificationActionType;
-  actionIdentifier: string | null;
-};
+## Quick start
 
-getInitialNotificationAction(): Promise<InitialNotificationAction | null>;
+Read the initial action once during application startup:
+
+```tsx
+import { useEffect } from 'react';
+import { getInitialNotificationAction } from 'react-native-local-notifications';
+
+function App() {
+  useEffect(() => {
+    getInitialNotificationAction()
+      .then((action) => {
+        if (!action) return;
+
+        // Navigate, update state, or record analytics.
+        console.log('App opened from notification', action);
+      })
+      .catch((error) => {
+        console.warn('Could not read the initial notification action', error);
+      });
+  }, []);
+
+  return null;
+}
 ```
 
-The call atomically takes and clears the in-memory value. The first call returns the captured action; later and concurrent calls return `null`. Nothing is persisted, so a normal app-icon launch returns `null`.
+The result looks like this:
 
-Consumer Jest tests can map the package to `react-native-local-notifications/jest/mock`; its function resolves to `null` by default.
+```ts
+{
+  notificationId: '2137',
+  categoryId: 'CATEGORY_ID',
+  channelId: 'example_channel', // Android only
+  action: 'tapped',
+  actionIdentifier: null,
+}
+```
 
-## Android host integration
+Before calling the JavaScript API, add the small native capture hook for each platform.
 
-Polaris values are defined once in `InitialNotificationActionParser`: `7` is `tapped`, `8` is `clear`, and `9` is `customAction`. Confirm these values against the consuming application during integration.
+## Native setup
 
-Capture before `super.onCreate`, so React Native cannot consume too early:
+### Android
+
+Capture the launch intent in your `MainActivity` **before** calling `super.onCreate`:
 
 ```kotlin
+import android.os.Bundle
 import com.localnotifications.InitialNotificationAction
 
 override fun onCreate(savedInstanceState: Bundle?) {
   InitialNotificationAction.captureInitialIntent(intent)
   super.onCreate(null)
-  // Existing setup...
 }
 ```
 
-The parser recognizes package-prefixed actions ending in `notification_clicked_action`, `notification_dismiss_action`, or `notification_cleared_action` and reads the documented Polaris extras. It copies primitive values and never retains the `Intent` or `Activity`.
+Do not capture `onNewIntent` events. Those happen while the app is already alive and should continue through your existing notification event listener.
 
-Do not add capture to `onNewIntent`. Warm actions remain with the existing `adc-platform-mobile-utils.notificationInteractionIntentFlow`; this package does not depend on it.
+### iOS
 
-## iOS host integration
+Expose the library header from your application's bridging header:
 
-Capture in `SceneDelegate` before starting React Native:
+```objc
+#import <InitialNotificationActionStore.h>
+```
 
-Expose `<InitialNotificationActionStore.h>` to Swift through the host's bridging header, then:
+Then capture the notification response in your `SceneDelegate` **before** starting React Native:
 
 ```swift
 func scene(
@@ -65,24 +111,28 @@ func scene(
   if let response = connectionOptions.notificationResponse {
     InitialNotificationActionStore.capture(response)
   }
-  // Only now call factory.startReactNative(...)
+
+  // Start React Native after capture.
+  // factory.startReactNative(...)
 }
 ```
 
-The response is reduced immediately to strings; no response or scene is retained. Default, dismiss, and non-empty custom identifiers map to `tapped`, `clear`, and `customAction`. `channelId` is always `null`.
+The library does not install a `UNUserNotificationCenterDelegate`, so it will not interfere with the delegate or notification library you already use.
 
-The package does not install a `UNUserNotificationCenterDelegate`. Warm actions remain with the existing `adc-platform-mobile-utils.notificationActionPublisher`.
+## Using cold-start and live actions together
 
-## React Native ordering
+This package only handles the action that launches a terminated app. Keep your existing listener for foreground, background, and warm-start actions.
 
-Subscribe to the live-action mechanism first, then consume the cold-start action:
+Subscribe to live events first, then retrieve the cold-start action. This avoids losing an event during application startup:
 
-```ts
+```tsx
 useEffect(() => {
   let cancelled = false;
+
   const handleAction = (action: NotificationActionInformation) => {
-    // Existing navigation behavior.
+    // Use one navigation path for cold-start and live actions.
   };
+
   const subscription = subscribeToLiveNotificationActions(handleAction);
 
   getInitialNotificationAction()
@@ -90,7 +140,7 @@ useEffect(() => {
       if (!cancelled && action) handleAction(action);
     })
     .catch((error) => {
-      // Log without crashing startup.
+      console.warn('Could not read the initial notification action', error);
     });
 
   return () => {
@@ -100,23 +150,73 @@ useEffect(() => {
 }, []);
 ```
 
-Subscribing first closes the gap between cold-start retrieval and live-event activation.
+`subscribeToLiveNotificationActions` is a placeholder for the listener supplied by your notification solution; it is not exported by this package.
 
-## Example test flow
+## API
 
-The example's notification creation code is demo-only and is not exported.
+### `getInitialNotificationAction()`
 
-1. Start the example and grant notification permission.
-2. Press **Create test notification**.
-3. Kill the application, then tap the notification.
-4. Verify ID `2137`, category `CATEGORY_ID`, and action `tapped` (`channelId` is `example_channel` on Android and `null` on iOS).
-5. Press **Consume again** and verify `null`.
-6. Kill the app, open it using the app icon, and verify `null`.
+```ts
+function getInitialNotificationAction(): Promise<
+  InitialNotificationAction | null
+>;
+```
 
-## Troubleshooting
+Returns the notification action that launched the current application process, or `null` when the app was opened normally or the action has already been consumed.
 
-- An icon launch returning `null` is expected.
-- On Android, verify every Polaris extra, the action suffix/value, and capture ordering.
-- On iOS, verify capture precedes `factory.startReactNative`.
-- A second call returning `null` is expected consume-once behavior.
-- Warm/background taps are intentionally outside this package.
+```ts
+type InitialNotificationActionType = 'tapped' | 'clear' | 'customAction';
+
+type InitialNotificationAction = {
+  notificationId: string;
+  categoryId: string | null;
+  channelId: string | null;
+  action: InitialNotificationActionType;
+  actionIdentifier: string | null;
+};
+```
+
+| Field | Description |
+| --- | --- |
+| `notificationId` | Identifier of the notification that triggered the action |
+| `categoryId` | Notification category, when supplied |
+| `channelId` | Android notification channel; always `null` on iOS |
+| `action` | Normalized tap, clear, or custom action |
+| `actionIdentifier` | Platform action identifier for a custom action, when supplied |
+
+The value is held in memory and atomically consumed. The first call receives it; later or concurrent calls return `null`. It is not persisted between application processes.
+
+## What this library does not do
+
+To stay small and composable, the package does not:
+
+- display or schedule notifications
+- request notification permissions
+- handle foreground, background, or warm-start events
+- install notification delegates
+- persist notification actions
+
+Use it as the cold-start companion to your existing notification solution.
+
+## Testing
+
+A Jest mock is available as a package export:
+
+```js
+moduleNameMapper: {
+  '^react-native-local-notifications$':
+    'react-native-local-notifications/jest/mock',
+}
+```
+
+The mock resolves to `null` by default. You can replace or spy on `getInitialNotificationAction` in tests that need a launch action.
+
+The repository also includes an [example application](./example) demonstrating native capture and consume-once behavior on both platforms.
+
+## Contributing
+
+Contributions of all sizes are welcome. See the [contributing guide](./CONTRIBUTING.md) for local setup, development commands, and pull request guidance. Please follow the project [code of conduct](./CODE_OF_CONDUCT.md).
+
+## License
+
+[MIT](./LICENSE)

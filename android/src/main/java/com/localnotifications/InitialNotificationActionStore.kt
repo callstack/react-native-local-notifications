@@ -17,7 +17,6 @@ internal object InitialNotificationActionParser {
   const val CHANNEL_ID = "notification_channel_id"
   const val ACTION_EXTRA = "action_extra"
 
-  // Polaris interaction values. Confirm these constants when Polaris changes its contract.
   const val ACTION_TAPPED = 7
   const val ACTION_CLEAR = 8
   const val ACTION_CUSTOM = 9

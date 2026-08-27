@@ -9,7 +9,8 @@ click "label=\"OK\""
 # Bind to SpringBoard before the delayed notification is delivered.
 open "com.apple.springboard"
 wait "Cold-start notification test" 10000
-click "role=\"other\" label=\"Cold-start notification test\""
+click "role=\"button\" label=\"now, Cold-start notification test, Kill the app, then tap this notification\""
+wait 1000
 
 # Rebind to the app launched by the notification tap without relaunching it.
 open "LocalNotificationsExample"

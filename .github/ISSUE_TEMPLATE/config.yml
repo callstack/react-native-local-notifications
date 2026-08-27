@@ -1,8 +1,5 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Feature Request 💡
-    url: https://oss.callstack.com/discussions/new?category=ideas
-    about: If you have a feature request, please create a new discussion on GitHub.
   - name: Discussions on GitHub 💬
-    url: https://oss.callstack.com/discussions
+    url: https://github.com/callstack/react-native-local-notifications/discussions
     about: If this library works as promised but you need help, please ask questions there.

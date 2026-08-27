@@ -13,7 +13,7 @@ import {
 import {
   getInitialNotificationAction,
   type InitialNotificationAction,
-} from 'react-native-local-notifications';
+} from '@callstack/react-native-local-notifications';
 
 type ActionButtonProps = {
   label: string;

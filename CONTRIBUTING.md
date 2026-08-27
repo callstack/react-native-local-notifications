@@ -85,6 +85,11 @@ To publish new versions, run the following:
 yarn release
 ```
 
+Publishing requires maintainer access to the `@callstack` npm organization and
+the GitHub repository. The release command selects the version, creates a
+`v<version>` tag, publishes to npm, and creates a GitHub release. Before
+releasing, run `yarn lint`, `yarn typecheck`, and `yarn prepare`, then inspect
+the package with `yarn npm publish --dry-run`.
 
 ### Scripts
 

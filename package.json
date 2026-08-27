@@ -1,5 +1,5 @@
 {
-  "name": "react-native-local-notifications",
+  "name": "@callstack/react-native-local-notifications",
   "version": "0.1.0",
   "description": "Consume the local-notification action that cold-started a React Native app",
   "main": "./lib/module/index.js",
@@ -50,21 +50,22 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://oss.callstack.com.git"
+    "url": "git+https://github.com/callstack/react-native-local-notifications.git"
   },
   "author": "Piotr Trocki <piotr.trocki@callstack.com> (https://oss.callstack.com)",
   "license": "MIT",
   "bugs": {
-    "url": "https://oss.callstack.com/issues"
+    "url": "https://github.com/callstack/react-native-local-notifications/issues"
   },
-  "homepage": "https://oss.callstack.com#readme",
+  "homepage": "https://github.com/callstack/react-native-local-notifications#readme",
   "publishConfig": {
+    "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
     "@eslint/compat": "^2.1.0",
     "@eslint/eslintrc": "^3.3.5",
-    "@eslint/js": "^10.0.1",
+    "@eslint/js": "^9.39.4",
     "@react-native/babel-preset": "0.85.0",
     "@react-native/eslint-config": "0.85.0",
     "@release-it/conventional-changelog": "^11.0.1",
@@ -72,7 +73,6 @@
     "del-cli": "^7.0.0",
     "eslint": "^9.39.4",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-ft-flow": "^3.0.11",
     "eslint-plugin-prettier": "^5.5.6",
     "prettier": "^3.8.3",
     "react": "19.2.3",
@@ -85,6 +85,13 @@
   "peerDependencies": {
     "react": "*",
     "react-native": "*"
+  },
+  "engines": {
+    "node": ">=22.11.0"
+  },
+  "resolutions": {
+    "eslint-plugin-ft-flow": "3.0.11",
+    "undici": "7.29.0"
   },
   "workspaces": [
     "example"

@@ -1,8 +1,10 @@
-# react-native-local-notifications
+# @callstack/react-native-local-notifications
 
 Recover the local-notification action that launched your React Native app from a terminated state.
 
-`react-native-local-notifications` bridges the cold-start notification response to JavaScript on iOS and Android. It gives your navigation or analytics code one consistent, typed action without taking ownership of notification scheduling or live notification events.
+`@callstack/react-native-local-notifications` bridges the cold-start notification response to JavaScript on iOS and Android. It gives your navigation or analytics code one consistent, typed action without taking ownership of notification scheduling or live notification events.
+
+Third-party services such as Braze or Firebase often already handle actions from remote notifications. This library is intended for applications where local and remote notifications use different mechanisms: keep using your existing provider for remote notifications, and use this package to recover the initial action from a local notification when it launches the app.
 
 ## Why use it?
 
@@ -15,15 +17,15 @@ Recover the local-notification action that launched your React Native app from a
 ## Installation
 
 ```sh
-yarn add react-native-local-notifications
+yarn add @callstack/react-native-local-notifications
 ```
 
 Or use your preferred package manager:
 
 ```sh
-npm install react-native-local-notifications
+npm install @callstack/react-native-local-notifications
 # or
-pnpm add react-native-local-notifications
+pnpm add @callstack/react-native-local-notifications
 ```
 
 Install iOS pods after adding the package:
@@ -40,7 +42,7 @@ Read the initial action once during application startup:
 
 ```tsx
 import { useEffect } from 'react';
-import { getInitialNotificationAction } from 'react-native-local-notifications';
+import { getInitialNotificationAction } from '@callstack/react-native-local-notifications';
 
 function App() {
   useEffect(() => {
@@ -133,7 +135,8 @@ useEffect(() => {
     // Use one navigation path for cold-start and live actions.
   };
 
-  const subscription = subscribeToLiveNotificationActions(handleAction);
+  // additional subscription to notifications
+  const subscription = subscribeToRemoteNotificationActions(handleAction);
 
   getInitialNotificationAction()
     .then((action) => {
@@ -150,16 +153,14 @@ useEffect(() => {
 }, []);
 ```
 
-`subscribeToLiveNotificationActions` is a placeholder for the listener supplied by your notification solution; it is not exported by this package.
+`subscribeToRemoteNotificationActions` is a placeholder for the listener supplied by your notification solution; it is not exported by this package.
 
 ## API
 
 ### `getInitialNotificationAction()`
 
 ```ts
-function getInitialNotificationAction(): Promise<
-  InitialNotificationAction | null
->;
+function getInitialNotificationAction(): Promise<InitialNotificationAction | null>;
 ```
 
 Returns the notification action that launched the current application process, or `null` when the app was opened normally or the action has already been consumed.
@@ -176,12 +177,12 @@ type InitialNotificationAction = {
 };
 ```
 
-| Field | Description |
-| --- | --- |
-| `notificationId` | Identifier of the notification that triggered the action |
-| `categoryId` | Notification category, when supplied |
-| `channelId` | Android notification channel; always `null` on iOS |
-| `action` | Normalized tap, clear, or custom action |
+| Field              | Description                                                   |
+| ------------------ | ------------------------------------------------------------- |
+| `notificationId`   | Identifier of the notification that triggered the action      |
+| `categoryId`       | Notification category, when supplied                          |
+| `channelId`        | Android notification channel; always `null` on iOS            |
+| `action`           | Normalized tap, clear, or custom action                       |
 | `actionIdentifier` | Platform action identifier for a custom action, when supplied |
 
 The value is held in memory and atomically consumed. The first call receives it; later or concurrent calls return `null`. It is not persisted between application processes.
@@ -204,8 +205,8 @@ A Jest mock is available as a package export:
 
 ```js
 moduleNameMapper: {
-  '^react-native-local-notifications$':
-    'react-native-local-notifications/jest/mock',
+  '^@callstack/react-native-local-notifications$':
+    '@callstack/react-native-local-notifications/jest/mock',
 }
 ```
 

@@ -1,0 +1,26 @@
+name: Feature request
+description: Suggest an improvement to the library.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for helping improve the project. Please describe the use case before proposing an API.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What problem or limitation are you trying to solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the behavior or API you would like to see.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Describe any workarounds or alternative designs you considered.

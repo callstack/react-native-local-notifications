@@ -1,6 +1,6 @@
 {
   "name": "@callstack/react-native-local-notifications",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Consume the local-notification action that cold-started a React Native app",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
